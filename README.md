@@ -15,6 +15,7 @@ A React-based web application for browsing Marvel Comics by character name. The 
 - **Marvel API**: Fetches comic data by character.
 - **Fetch API**: For making HTTP requests to the Marvel API.
 - **CSS / SCSS**: For styling the application.
+- **md5**: For hashing the API request.
 
 ## Installation
 
@@ -22,6 +23,6 @@ A React-based web application for browsing Marvel Comics by character name. The 
 
    ```bash
    git clone https://github.com/dhruvan12/Marval_comic
-   cd marvel-comics
+   cd Marvel-comic
 
 <img src="https://github.com/dhruvan12/Marval_comic/blob/master/src/images/example.png">
