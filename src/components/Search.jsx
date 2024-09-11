@@ -1,15 +1,17 @@
 import React from 'react';
 import '../styles/Search.scss'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import md5 from 'md5';
 import Characters from './Characters';
 import Comics from './Comics';
+import LoadingGIF from '../images/spinner.gif'
 
 const Search = () => {
 
     const [characterName, setCharacterName] = useState("");
     const [characterData, setCharacterData] = useState(null)
     const [comicData, setComicData] = useState(null)
+    const [isLoading, setIsLoading] = useState(false)
 
     const publicKey = import.meta.env.VITE_PUBLIC_KEY
     const privateKey = import.meta.env.VITE_PRIVATE_KEY
@@ -19,7 +21,7 @@ const Search = () => {
 
         getCaracterData();
     }
-    const getCaracterData = () => {
+    const getCharacterData = () => {
         setCharacterData(null)
         setComicData(null)
 
@@ -28,37 +30,47 @@ const Search = () => {
 
         const url = `https://gateway.marvel.com:443/v1/public/characters?apikey=${publicKey}&hash=${hash}&ts=${timeStamp}&nameStartsWith=${characterName}&limit=100`;
 
+        setIsLoading(true)
+
         fetch(url)
             .then((response) => response.json())
             .then((result) => {
                 setCharacterData(result.data);
-                console.log(result);
+                // console.log(result);
             }).catch((error) => {
                 console.log("There was an error", error);
+            }).finally(() => {
+                setIsLoading(false);
             })
-        // in this namestart with is for serching the front part of the character in data set
-        // by default limit is 20 max 
+
+
+
     }
-    
-        const getComicData = (characterId) => {
-            window.scrollTo({ top: 0, left: 0 });
-        
-            const timeStamp = new Date().getTime();
-            const hash = generateHash(timeStamp);
-        
-            const url = `https://gateway.marvel.com:443/v1/public/characters/${characterId}/comics?apikey=${publicKey}&hash=${hash}&ts=${timeStamp}`;
-        
-            fetch(url)
-              .then((response) => response.json())
-              .then((result) => {
+    useEffect(() => {
+        if (characterName) {
+            getCharacterData();
+        }
+    }, [characterName]);
+
+    const getComicData = (characterId) => {
+        window.scrollTo({ top: 0, left: 0 });
+
+        const timeStamp = new Date().getTime();
+        const hash = generateHash(timeStamp);
+
+        const url = `https://gateway.marvel.com:443/v1/public/characters/${characterId}/comics?apikey=${publicKey}&hash=${hash}&ts=${timeStamp}`;
+
+        fetch(url)
+            .then((response) => response.json())
+            .then((result) => {
                 setComicData(result.data);
                 console.log(result.data);
-              })
-              .catch(() => {
+            })
+            .catch(() => {
                 console.log("error while getting comic data");
-              });
-          };
-    
+            });
+    };
+
 
     const generateHash = (timeStamp) => {
         return md5(timeStamp + privateKey + publicKey);
@@ -76,22 +88,32 @@ const Search = () => {
 
     return (
         <>
-       
-        <form className="search" onSubmit={handleSubmit}>
 
-            <input type="text"
-                placeholder='Enter Character Name'
-                onChange={handleChange}
-            />
-            <div className='buttons'>
-                <button type="submit"> Get character data</button>
-                <button type="reset" className="reset" onClick={handleReset}>Reset</button>
-            </div>
-        </form>
-        {!comicData && characterData && characterData.results[0] && (
-        <Characters data={characterData.results} onClick={getComicData} />
-      )}
-        {comicData && comicData.results[0] && <Comics data={comicData.results}/>}
+            <form className="search" onSubmit={handleSubmit}>
+
+                <input type="text"
+                    placeholder='Enter Character Name'
+                    onChange={handleChange}
+                />
+                <div className='buttons'>
+                    <button type="submit"> Get character data</button>
+                    <button type="reset" className="reset" onClick={handleReset}>Reset</button>
+                </div>
+            </form>
+            {isLoading ? (
+                <img style={{ width: "100px", height: "100px" }} src={LoadingGIF} alt='loading...' />
+            ) : (
+                <div style={{ display: characterData === null ? "none" : "block" }}>
+                    <h2 style={{ color: "#bfbfbf" }}>
+                        I Found Amazing Comic About {characterName}
+                    </h2>
+                </div>
+
+            )}
+            {!comicData && characterData && characterData.results[0] && (
+                <Characters data={characterData.results} onClick={getComicData} />
+            )}
+            {comicData && comicData.results[0] && <Comics data={comicData.results} />}
 
 
         </>
