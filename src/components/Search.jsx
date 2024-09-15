@@ -45,8 +45,6 @@ const Search = () => {
                 setIsLoading(false);
             })
 
-
-
     }
     // if we include this then while writing a single latter  in taxtbox it request data and become very slow
     // it will search data without submitting
