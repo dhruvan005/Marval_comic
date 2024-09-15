@@ -7,19 +7,21 @@ import Comics from './Comics';
 import LoadingGIF from '../images/spinner.gif'
 
 const Search = () => {
-
+    // setting up the state 
     const [characterName, setCharacterName] = useState("");
     const [characterData, setCharacterData] = useState(null)
     const [comicData, setComicData] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
 
+    // importing the api keys from meta.env
     const publicKey = import.meta.env.VITE_PUBLIC_KEY
     const privateKey = import.meta.env.VITE_PRIVATE_KEY
 
     const handleSubmit = (event) => {
-        event.preventDefault();
-
-        getCaracterData();
+        
+       event.preventDefault(); // this is priventing the default behivour of the form
+       // after the click on button the getCharacterData triggerd
+        getCharacterData();
     }
     const getCharacterData = () => {
         setCharacterData(null)
@@ -46,11 +48,13 @@ const Search = () => {
 
 
     }
-    useEffect(() => {
-        if (characterName) {
-            getCharacterData();
-        }
-    }, [characterName]);
+    // if we include this then while writing a single latter  in taxtbox it request data and become very slow
+    // it will search data without submitting
+    // useEffect(() => {
+    //     if (characterName) {
+    //         getCharacterData();
+    //     }
+    // }, [characterName]);
 
     const getComicData = (characterId) => {
         window.scrollTo({ top: 0, left: 0 });
@@ -64,7 +68,7 @@ const Search = () => {
             .then((response) => response.json())
             .then((result) => {
                 setComicData(result.data);
-                console.log(result.data);
+                // console.log(result.data);
             })
             .catch(() => {
                 console.log("error while getting comic data");
